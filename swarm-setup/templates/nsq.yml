@@ -10,7 +10,7 @@ services:
     image: unibaktr/nsq
     entrypoint: nsqlookupd
     networks:
-      nsq-net:
+      - nsq-net
     deploy:
       restart_policy:
         condition: on-failure
@@ -24,7 +24,7 @@ services:
     image: unibaktr/nsq
     entrypoint: ["nsqd", "--lookupd-tcp-address=nsqlookupd:4160"]
     networks:
-      nsq-net:
+      - nsq-net
     deploy:
       mode: global
       restart_policy:

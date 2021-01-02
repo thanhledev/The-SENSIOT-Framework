@@ -19,7 +19,6 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--providers.docker.constraints=Label(`traefik.tags`,`public`)"
-      - "--providers.docker.network=traefik-net"
       - "--log.level=DEBUG"
       - "--api.insecure=true"
       - "--api.dashboard=true"
@@ -40,9 +39,8 @@ services:
         - "traefik.enable=true"
         - "traefik.tags=public"
         - "traefik.http.routers.api.rule=Host(`traefik.{DOMAIN}`)"
-        - "traefik.http.routers.api.entrypoints=web"
         - "traefik.http.routers.api.service=api@internal"
-        - "traefik.http.services.api.loadbalancer.server.port=8080"
+        - "traefik.docker.network=traefik-net"
 
   visualizer:
     image: dockersamples/visualizer
@@ -57,15 +55,13 @@ services:
       restart_policy:
         condition: on-failure
       labels:
-        - "traefik.enable=true"
-        - "traefik.tags=public"
+        - "traefik.backend=visualizer"
+        - "traefik.backend.loadbalancer.stickiness=true"
         - "traefik.docker.network=traefik-net"
-        - "traefik.http.routers.viz.rule=Host(`visualizer.{DOMAIN}`)"
-        - "traefik.http.routers.viz.entryPoints=web"
-        - "traefik.http.services.viz.loadbalancer.passhostheader=true"
-        - "traefik.http.services.viz.loadbalancer.server.port=8080"
-        - "traefik.http.services.viz.loadbalancer.sticky=true"
-        - "traefik.http.services.viz.loadbalancer.sticky.cookie.name=VisualizerStickySession"
+        - "traefik.frontend.entryPoints=http"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.port=8080"
+        - "traefik.frontend.rule=Host(`visualizer.{DOMAIN}`)"
 
   portainer:
     image: portainer/portainer
@@ -82,12 +78,10 @@ services:
       restart_policy:
         condition: on-failure
       labels:
-        - "traefik.enable=true"
-        - "traefik.tags=public"
+        - "traefik.backend=portainer"
+        - "traefik.backend.loadbalancer.stickiness=true"
         - "traefik.docker.network=traefik-net"
-        - "traefik.http.routers.por.rule=Host(`portainer.{DOMAIN}`)"
-        - "traefik.http.routers.por.entrypoints=web"
-        - "traefik.http.services.por.loadbalancer.passhostheader=true"
-        - "traefik.http.services.por.loadbalancer.server.port=9000"
-        - "traefik.http.services.por.loadbalancer.sticky=true"
-        - "traefik.http.services.por.loadbalancer.sticky.cookie.name=PortainerStickySession"
+        - "traefik.frontend.entryPoints=http"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.port=9000"
+        - "traefik.frontend.rule=Host(`portainer.{DOMAIN}`)"

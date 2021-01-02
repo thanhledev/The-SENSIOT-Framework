@@ -13,8 +13,8 @@ services:
     image: unibaktr/nsq
     entrypoint: ["nsqadmin", "--lookupd-http-address=nsqlookupd:4161"]
     networks:
-      traefik-net:
-      nsq-net:
+      - traefik-net
+      - nsq-net
     deploy:
       restart_policy:
         condition: on-failure
@@ -24,11 +24,12 @@ services:
         constraints:
           - node.role == manager
       labels:
-        traefik.backend: nsqadmin
-        traefik.backend.loadbalancer.sticky: "true"
-        traefik.docker.network: "traefik-net"
-        traefik.enable: "true"
-        traefik.frontend.entryPoints: "http"
-        traefik.frontend.passHostHeader: "true"
-        traefik.frontend.rule: "Host:nsqadmin.{DOMAIN}"
-        traefik.port: "4171"
+        - "traefik.enable=true"
+        - "traefik.tags=public"
+        - "traefik.docker.network=traefik-net"
+        - "traefik.http.routers.nsqadmin.rule=Host(`nsqadmin.{DOMAIN}`)"
+        - "traefik.http.routers.nsqadmin.entrypoints=web"
+        - "traefik.http.services.nsqadmin.loadbalancer.passhostheader=true"
+        - "traefik.http.services.nsqadmin.loadbalancer.server.port=4171"
+        - "traefik.http.services.nsqadmin.loadbalancer.sticky=true"
+        - "traefik.http.services.nsqadmin.loadbalancer.sticky.cookie.name=NsqAdminStickySession"

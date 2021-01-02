@@ -16,8 +16,8 @@ services:
   influxdb_writer:
     image: "{IMAGE}"
     networks:
-      influxdb-net:
-      nsq-net:
+      - influxdb-net
+      - nsq-net
     environment:
       CONFIG: /run/secrets/sensiot.json
       SERVICE: "influxdb_writer"

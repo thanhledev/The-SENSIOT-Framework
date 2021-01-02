@@ -11,7 +11,7 @@ services:
     volumes:
       - ./data/influxdb:/var/lib/influxdb
     networks:
-      influxdb-net:
+      - influxdb-net
     deploy:
       restart_policy:
         condition: on-failure

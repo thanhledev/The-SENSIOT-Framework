@@ -15,8 +15,8 @@ services:
     volumes:
       - ./data/chronograf:/var/lib/chronograf
     networks:
-      traefik-net:
-      influxdb-net:
+      - traefik-net
+      - influxdb-net
     deploy:
       restart_policy:
         condition: on-failure
@@ -26,11 +26,12 @@ services:
         constraints:
           - node.role == manager
       labels:
-        traefik.backend: chronograf
-        traefik.backend.loadbalancer.sticky: "true"
-        traefik.docker.network: "traefik-net"
-        traefik.enable: "true"
-        traefik.frontend.entryPoints: "http"
-        traefik.frontend.passHostHeader: "true"
-        traefik.frontend.rule: "Host:chronograf.{DOMAIN}"
-        traefik.port: "8888"
+        - "traefik.enable=true"
+        - "traefik.tags=public"
+        - "traefik.docker.network=traefik-net"
+        - "traefik.http.routers.chronograf.rule=Host(`chronograf.{DOMAIN}`)"
+        - "traefik.http.routers.chronograf.entrypoints=web"
+        - "traefik.http.services.chronograf.loadbalancer.passhostheader=true"
+        - "traefik.http.services.chronograf.loadbalancer.server.port=8888"
+        - "traefik.http.services.chronograf.loadbalancer.sticky=true"
+        - "traefik.http.services.chronograf.loadbalancer.sticky.cookie.name=ChronografStickySession"

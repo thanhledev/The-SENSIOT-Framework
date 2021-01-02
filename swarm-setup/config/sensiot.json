@@ -33,7 +33,7 @@
             "sensor_count": 5,
             "temperature": 25.0,
             "humidity": 62.0,
-            "interval": 60
+            "interval": 30
           }
         }
       }
